@@ -23,6 +23,7 @@ export default function DayArchivePage() {
   const router = useRouter();
   const { init, setActiveDate, activeDate, themeAccent } = useDayStore();
   const [hasHydrated, setHasHydrated] = useState(false);
+  const [isReadOnly, setIsReadOnly] = useState(true);
 
   const dateParam = params.date as string;
 
@@ -32,6 +33,18 @@ export default function DayArchivePage() {
     init();
     if (dateParam) {
       setActiveDate(dateParam);
+      try {
+        const parsedDate = parseDateKey(dateParam);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const compareDate = new Date(parsedDate);
+        compareDate.setHours(0, 0, 0, 0);
+        
+        setIsReadOnly(compareDate < today);
+      } catch (e) {
+        setIsReadOnly(true);
+      }
     }
   }, [dateParam, init, setActiveDate]);
 
@@ -94,25 +107,25 @@ export default function DayArchivePage() {
       </div>
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative z-10">
-        {/* Left Column: Read-Only Grid Timeline & Bottom Panels */}
+        {/* Left Column: Timeline & Bottom Panels */}
         <div className="lg:col-span-8 flex flex-col">
-          <DayHeader isReadOnly={true} />
-          <TimeGrid isReadOnly={true} />
+          <DayHeader isReadOnly={isReadOnly} />
+          <TimeGrid isReadOnly={isReadOnly} />
 
-          {/* Read-only Notes and Reflection Cards below timeline */}
+          {/* Notes and Reflection Cards below timeline */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-            <NotesPanel isReadOnly={true} />
-            <ReflectionPanel isReadOnly={true} />
+            <NotesPanel isReadOnly={isReadOnly} />
+            <ReflectionPanel isReadOnly={isReadOnly} />
           </div>
         </div>
 
-        {/* Right Column: Read-Only Widgets */}
+        {/* Right Column: Widgets */}
         <div className="lg:col-span-4 flex flex-col gap-6 lg:mt-[105px]">
           <PomodoroTimer />
           <MiniCalendar />
-          <DailyMetrics isReadOnly={true} />
-          <MITList isReadOnly={true} />
-          <TaskList isReadOnly={true} />
+          <DailyMetrics isReadOnly={isReadOnly} />
+          <MITList isReadOnly={isReadOnly} />
+          <TaskList isReadOnly={isReadOnly} />
         </div>
       </div>
     </motion.div>

@@ -4,6 +4,7 @@ import { getFormattedDateLabel, getDaysDifference, formatDateKey, parseDateKey }
 import { addDays, subDays } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface DayHeaderProps {
   isReadOnly?: boolean;
@@ -19,6 +20,7 @@ const ACCENT_OPTIONS = [
 ] as const;
 
 export const DayHeader: React.FC<DayHeaderProps> = ({ isReadOnly = false }) => {
+  const router = useRouter();
   const { activeDate, appStartDate, days, setActiveDate, isSaving, themeAccent, setThemeAccent } = useDayStore();
 
   // Dynamically inject the CSS variable for theme accent color
@@ -49,16 +51,33 @@ export const DayHeader: React.FC<DayHeaderProps> = ({ isReadOnly = false }) => {
 
   const handlePrevDay = () => {
     const prev = subDays(parsedActiveDate, 1);
-    setActiveDate(formatDateKey(prev));
+    const dateKey = formatDateKey(prev);
+    const todayKey = formatDateKey(new Date());
+
+    if (dateKey !== todayKey) {
+      router.push(`/day/${dateKey}`);
+    } else {
+      setActiveDate(dateKey);
+      router.push("/");
+    }
   };
 
   const handleNextDay = () => {
     const next = addDays(parsedActiveDate, 1);
-    setActiveDate(formatDateKey(next));
+    const dateKey = formatDateKey(next);
+    const todayKey = formatDateKey(new Date());
+
+    if (dateKey !== todayKey) {
+      router.push(`/day/${dateKey}`);
+    } else {
+      setActiveDate(dateKey);
+      router.push("/");
+    }
   };
 
   const handleJumpToToday = () => {
     setActiveDate(todayKey);
+    router.push("/");
   };
 
   return (

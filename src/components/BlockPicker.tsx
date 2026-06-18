@@ -150,7 +150,7 @@ export const BlockPicker: React.FC<BlockPickerProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-start md:items-center justify-center p-4 overflow-y-auto bg-black/60 backdrop-blur-sm">
       {/* Click outside to close */}
       <div className="absolute inset-0" onClick={onClose} />
 
@@ -160,7 +160,7 @@ export const BlockPicker: React.FC<BlockPickerProps> = ({
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         transition={{ type: "spring", stiffness: 350, damping: 25 }}
-        className="w-full max-w-[340px] bg-surface border border-border p-5 rounded relative shadow-2xl z-10"
+        className="w-full max-w-[340px] bg-surface border border-border p-5 rounded relative shadow-2xl z-10 my-auto"
       >
         {/* Close Button */}
         <button

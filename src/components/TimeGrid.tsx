@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { DndContext, DragEndEvent, useSensor, useSensors, PointerSensor } from "@dnd-kit/core";
+import { DndContext, DragEndEvent, useSensor, useSensors, MouseSensor, TouchSensor } from "@dnd-kit/core";
 import { restrictToFirstScrollableAncestor, restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { useDayStore, TimeBlock as TimeBlockType } from "../store/useDayStore";
 import { TimeBlock } from "./TimeBlock";
@@ -28,13 +28,18 @@ export const TimeGrid: React.FC<TimeGridProps> = ({ isReadOnly = false }) => {
   const [editingBlock, setEditingBlock] = useState<TimeBlockType | null>(null);
 
   // DnD Kit sensors configuration
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 4, // allow slight movement before drag starts (helps click vs drag distinction)
-      },
-    })
-  );
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: {
+      distance: 4, // drag 4px to start
+    },
+  });
+  const touchSensor = useSensor(TouchSensor, {
+    activationConstraint: {
+      delay: 200, // hold 200ms to start drag on touch
+      tolerance: 5,
+    },
+  });
+  const sensors = useSensors(mouseSensor, touchSensor);
 
   const handleDragEnd = (event: DragEndEvent) => {
     if (isReadOnly) return;
@@ -83,18 +88,26 @@ export const TimeGrid: React.FC<TimeGridProps> = ({ isReadOnly = false }) => {
     });
   };
 
-  const handleCreateBlock = (title: string, category: "sleep" | "work" | "gym" | "food" | "leisure" | "study" | "custom", customColor?: string) => {
+  const handleCreateBlock = (
+    title: string,
+    category: "sleep" | "work" | "gym" | "food" | "leisure" | "study" | "custom",
+    customColor?: string,
+    categoryName?: string,
+    startMinutes?: number,
+    durationMinutes?: number
+  ) => {
     if (!pickerState) return;
 
-    // Determine a fitting default duration (e.g. 60 mins)
-    const duration = 60;
+    const finalStart = startMinutes !== undefined ? startMinutes : pickerState.startMinutes;
+    const finalDuration = durationMinutes !== undefined ? durationMinutes : 60;
     
     addBlock({
       title: title.trim() || `New ${category.charAt(0).toUpperCase() + category.slice(1)} Session`,
       category,
       customColor,
-      startMinutes: pickerState.startMinutes,
-      durationMinutes: duration,
+      categoryName,
+      startMinutes: finalStart,
+      durationMinutes: finalDuration,
     });
 
     setPickerState(null);

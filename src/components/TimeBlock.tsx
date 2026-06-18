@@ -149,6 +149,7 @@ export const TimeBlock: React.FC<TimeBlockProps> = ({ block, isReadOnly = false,
     height: `${height}px`,
     zIndex: isDragging || isResizing ? 40 : 10,
     borderLeftColor: block.category === "custom" && block.customColor ? block.customColor : undefined,
+    touchAction: "none",
     ...dragStyle,
   };
 
